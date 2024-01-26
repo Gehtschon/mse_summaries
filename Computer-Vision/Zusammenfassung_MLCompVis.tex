@@ -29,7 +29,7 @@
 \usepackage[normalem]{ulem}
 
 % Code highlighting
-\usepackage{minted}
+\usepackage[outputdir=../]{minted}
 \usepackage{pythonhighlight}
 \surroundwithmdframed{minted}
 
@@ -74,13 +74,12 @@
 
 \begin{document}
 	
-\title{Machine Learning in Computer Vision FS20}
-\author{Pascal Baumann\\pascal.baumann@stud.hslu.ch}
+\title{Computer Vision HS23}
+\author{Fabian Glutz\\fabian.glutz@students.fhnw.ch}
 \maketitle
 
 
 
-For errors or improvement raise an issue or make a pull request on the \href{https://github.com/KilnOfTheSecondFlame/mse_summaries}{github repository}.
 
 \tableofcontents
 \newpage
@@ -89,11 +88,12 @@ For errors or improvement raise an issue or make a pull request on the \href{htt
 \section{Image Handling in Python}
 
 \begin{minted}[tabsize=2]{python}
+plt.imshow();
 plt.imshow(np.hstack((im_float, im_float)), cmap="gray", vmin=0, vmax=1);
 \end{minted}
 
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/hstack_image}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/hstack_image.png}
 \end{center}
 
 \subsection{Fading an Image}
@@ -113,7 +113,7 @@ plt.imshow(np.hstack(ims),vmin=0, vmax=1, cmap="gray")
 \end{minted}
 
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/snoopy_fade}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/snoopy_fade.png}
 \end{center}
 
 \subsubsection{IPyWidgets}
@@ -129,28 +129,120 @@ def threshold(thresh):
 \end{minted}
 
 \begin{center}
-	\includegraphics[width=0.6\linewidth]{img/ipywidgets_example}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/ipywidgets_example.png}
 \end{center}
+
 
 \section{Local Filtering and Edge Detection}
 \subsection{Filtering}
 The naive approach of local filtering is taking just a moving average of the pixels in the neighbourhood.
 
+\subsection{Moving average}
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/MovingAverage.PNG}
+\end{center}
+\begin{equation}
+     b_{smoothed}[i] = \frac{1}{2r+1} \sum_{j=i=-r}^{i+r} b[j] 
+\end{equation}
+
+ \begin{center}\begin{tabular}{rclcrcl}
+   $r$ & = & range of the points  \\ 
+   $b$ & = & Point \\
+\end{tabular}\end{center}
+
 \subsection{Convolution}
 Convolve an input matrix (the input image) with a \textbf{kernel}, which is a matrix defining a weight for every element of the neighbourhood. The convolution can be considered a moving weighted average of the pixels.
+
+\textbf{1D Example}
+\begin{equation}
+     (a\ast b)[i] = \sum_{j}^{} a[j]b[j-1] 
+\end{equation}
+
+ \begin{center}\begin{tabular}{rclcrcl}
+   $a$ & = & Filter e.g.  [1,4,6,4,1]/16\\ 
+   $b$ & = & Point \\
+\end{tabular}\end{center}
+
+
+\textbf{2D Example}
+\begin{equation}
+     (a\ast b)[i,j] = \sum_{j',j'}^{} a[i',j']b[i-i',j-j'] 
+\end{equation}
+
+ \begin{center}\begin{tabular}{rclcrcl}
+   $a$ & = & Filter e.g.  [1,4,6,4,1]/16\\ 
+   $b$ & = & Point \\
+\end{tabular}\end{center}
+
+
 \begin{center}
-	\includegraphics[width=0.4\linewidth]{img/Kernel_Convolution}
+	\includegraphics[width=0.4\linewidth]{Machine Learning in Computer Visualisation/img/Kernel_Convolution.png}
 \end{center}
 This kernel slides across the input matrix. At each location, the product between each element of the kernel and the input element it overlaps is computed and the results are summed up to obtain the output in the current location. In general, if the input matrix has  $i$ rows and the kernel has $k$ rows, the output will have $i-k+1$ rows, the same applies to columns.
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{img/ConvolutionOutput}
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/ConvolutionOutput.png}
 \end{center}
+
+
+\subsubsection{Smooth filter}
+This smoothes the picture.
+\begin{center}
+    $ \frac{1}{9}\begin{bmatrix}
+    1 & 1 & 1 \\
+    1 & 1 & 1 \\
+    1 & 1 & 1 
+    \end{bmatrix}  $
+\end{center}
+Usually done with a Gaussian filter.
+
+
+\subsubsection{Sharpening filter}
+This smoothes the picture.
+\begin{equation}
+\begin{bmatrix}
+    0 & 0 & 0 \\
+    0 & 2 & 0 \\
+    0 & 0 & 0 
+    \end{bmatrix} 
+    -
+    \frac{1}{9}\begin{bmatrix}
+    1 & 1 & 1 \\
+    1 & 1 & 1 \\
+    1 & 1 & 1 
+    \end{bmatrix}
+    =
+    \frac{1}{9}\begin{bmatrix}
+    -1 & -1 & -1 \\
+    -1 & 17 & -1 \\
+    -1 & -1 & -1 
+    \end{bmatrix}
+\end{equation}
+
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/sharpening.PNG}
+\end{center}
+
+\subsection{Gaussian filter}
+\begin{center}
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/GaussFilter.PNG}
+\end{center}
+
+\noindent A Gaussian filter has a symmetrical value increase from outside to inside, with the highest value in the middle.
+
+\begin{equation}
+\frac{1}{16}
+\begin{bmatrix}
+    1 & 2 & 1 \\
+    2 & 4 & 2 \\
+    1 & 2 & 1 
+    \end{bmatrix} 
+\end{equation}
 
 \subsection{Edge Detection}
 Although intuitive for humans to detect, edge detection was a hard problem in image processing. And edge is defined by a rapid change in the intensity, which can be exploited by calculating the derivative.
 
 \begin{center}
-	\includegraphics[width=0.6\linewidth]{img/1D_edge_derivative}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/1D_edge_derivative.png}
 \end{center}
 
 \noindent
@@ -166,6 +258,13 @@ In two dimensions the derivative corresponds to the gradient $\nabla f = \left[\
 \end{align}
 
 But not all important edges have strong gradients, nor are all strong gradients important edges.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/Gradient.PNG}
+	\caption{Gradient goes from black to white}
+	\label{fig:Gradient_verlauf}
+\end{figure}
 
 \subsubsection{Computing the Gradient on an Image}
 Approximate Gradient in direction of $ \frac{\partial f}{\partial x} $: Convolution with kernel \begin{tabular}{|c|c|}
@@ -186,7 +285,7 @@ Approximate Gradient in direction of $ \frac{\partial f}{\partial y} $: Convolut
 The drawback of the gradient is, that it is very sensitive to noise:
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{noise_gradient}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/noise_gradient.png}
 	\caption{Gradient of a 1D function, where it is clear how it amplifies noise and may conceal a weak signal}
 	\label{fig:noisegradient}
 \end{figure}
@@ -200,6 +299,14 @@ The larger the value of $\sigma$ the more smoothing is applied and different kin
 	\item[\textbf{smaller value of $\sigma$}] finer details detected
 \end{itemize}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/Gradient_withGauss.PNG}
+	\caption{Gradient with Gaussian smoothing}
+	\label{fig:noisegradient-smoothed}
+\end{figure}
+
+
 \noindent
 \begin{minipage}{0.6\textwidth}
 	In practice a convolution with a derivative of Gaussian filter is calculated to compute the gradients.
@@ -208,13 +315,13 @@ The larger the value of $\sigma$ the more smoothing is applied and different kin
 \end{minipage}
 \begin{minipage}{0.4\textwidth}
 	\begin{center}
-		\includegraphics[width=0.6\linewidth]{img/derivative_gaussian_filter}
+		\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/derivative_gaussian_filter.png}
 	\end{center}
 \end{minipage}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.6\linewidth]{img/derivative_gaussian_filter2}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/derivative_gaussian_filter2.png}
 	\caption{Derivative of Gaussian Filters}
 	\label{fig:derivativegaussianfilter2}
 \end{figure}
@@ -226,8 +333,11 @@ The larger the value of $\sigma$ the more smoothing is applied and different kin
 	\item Derivative filters yield large responses at points with high contrast
 \end{itemize}
 
+
 \subsection{Canny Edge Detection}
 Same base approach but enhanced with edge thinning and hysteresis thresholding.\footnote{A good explanation with sample code can be found under \href{https://docs.opencv.org/4.3.0/da/d22/tutorial_py_canny.html}{OpenCV Canny Edge Detection Tutorial}}
+\newline
+\textbf{Canny Edge Algorithm}
 \begin{enumerate}
 	\item Approximate gradients along axes by derivative of Gaussian filters
 	\item Compute gradient magnitude
@@ -235,13 +345,21 @@ Same base approach but enhanced with edge thinning and hysteresis thresholding.\
 	\item Only keep strong edges through hysteresis thresholding 
 \end{enumerate}
 
-\subsection{Hysteresis Thresholding}
+\subsubsection{Non-maxima suppression}
+Only keep the maxima of a line
+\begin{figure}[H]
+	\centering
+	\includegraphics[keepaspectratio,width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/NonMaimaSupression.PNG}
+	\caption{Non-maxima impression. Results in thinning the edge to a 1 Pixel width.}
+\end{figure}
+
+\subsubsection{Hysteresis Thresholding}
 This stage decides which are all edges are really edges and which are not. For this, two threshold values, minVal and maxVal, are needed. Any edges with intensity gradient more than maxVal are sure to be edges and those below minVal are sure to be non-edges, and are thus discarded. Those who lie between these two thresholds are classified edges or non-edges based on their connectivity. If they are connected to "sure-edge" pixels, they are considered to be part of edges. Otherwise, they are also discarded.
 	
 \begin{figure}[H]
 	\centering
-	\includegraphics[keepaspectratio,width=0.6\linewidth]{hysteresis_thresholding}
-	\caption{Hysteresis thresholding with A) sure edge, B) non-edge and C) a non-edge connected to a sure edge}
+	\includegraphics[keepaspectratio,width=1\linewidth]{Machine Learning in Computer Visualisation/img/hysteresis_thresholding.png}
+	\caption{Hysteresis thresholding for edge detection. Edges lower than the high threshold are only looked at if before were higher than the high threshold}
 \end{figure}
 
 \section{Model Fitting and Line and Circle Detection}
@@ -254,8 +372,8 @@ Model fitting is an algorithm that finds or fits a high-level explanation or mod
 Voting algorithms are a general technique for decision methods.
 
 \begin{enumerate}
-	\item Every feature casts votes for all models that are compatible with it
-	\item Choose models that accumulate a lot of votes
+	\item \textbf{Every feature casts votes for all models that are compatible with it}
+	\item \textbf{Choose models that accumulate a lot of votes}
 \end{enumerate}
 
 Clutter and noise will cast a lot of votes, but are inconsistent. Instead, features belonging to a model will concentrate a lot of votes for that model.
@@ -266,18 +384,38 @@ Clutter and noise will cast a lot of votes, but are inconsistent. Instead, featu
 	\item Choose \textbf{lines} that accumulated a lot of votes
 \end{enumerate}
 
+\textbf{Hough line to point}
+\begin{equation}
+    y = m_0x+b_0
+\end{equation}
+
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\linewidth,keepaspectratio]{img/line_representation_hough}
+	\includegraphics[width=0.8\linewidth,keepaspectratio]{Machine Learning in Computer Visualisation/img/line_representation_hough.png}
 	\caption{Line representation in Hough space}
+\end{figure}
+
+\textbf{Hough line to point}
+\begin{equation}
+    b = -xm_0+y_0
+\end{equation}
+This means drawing a line for every $m_0$. (To draw, set two $m_0$ and draw the line and extend it...)
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/points_representation_hough.png}
+	\caption{Points on a line in normal space almost intersect in Hough space}
+	\label{fig:pointsrepresentationhough}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\linewidth]{img/points_representation_hough}
-	\caption{Points on a line in normal space almost intersect in Hough space}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/hough_uebungen.png}
+	\caption{Points on a line intersect in Hough space}
 	\label{fig:pointsrepresentationhough}
 \end{figure}
+
+
 
 \noindent
 The problem with this approach is that
@@ -288,28 +426,65 @@ The problem with this approach is that
 
 \subsection{Representation of Lines in Polar Coordinates}
 
+The angle 0 is located on the x-axis to the right $\rightarrow$.
+
+\begin{equation}
+     \theta = \{0^\circ,360^\circ \}
+     d = \{ 0^\circ, \sqrt{x_{max}^2 + y_{max}^2} \}
+\end{equation}
+
+\begin{equation}
+     d = \{ 0^\circ, \sqrt{x_{max}^2 + y_{max}^2} \}
+\end{equation}
+
+ \begin{center}\begin{tabular}{rclcrcl}
+   $\theta$ & = & Angle in degree\\ 
+   $d$ & = & distance from line to origin \\
+\end{tabular}\end{center}
+
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\linewidth]{img/line_representation_polar}
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/line_representation_polar.png}
 	\caption{Line representation with polar parameters}
 	\label{fig:linerepresentationpolar}
 \end{figure}
 
-This approach solves both the problem of unboundedness and representation. The parameter $\theta$ is bounded by $[0,2\pi]$ and $d$ by $[0,\text{imagewidth}]$.
+\noindent This approach solves both the problem of unboundedness and representation. The parameter $\theta$ is bounded by $[0,2\pi]$ and $d$ by $[0,\text{imagewidth}]$.
 
-For every point in normal space there will be a Sinusoid the polar Hough space.
+\noindent For every point in normal space there will be a Sinusoid the polar Hough space.
 
 \subsection{Hough Transformation Algorithm}
-The algorithm transforms each edge point in the image to the Hough space, where an Accumulator array gets filled with votes. The bin size of the accumulator is an important hyperparameter, if the size is too small, there will be many weak peaks due to noise, if too large accuracy of locating a line drops and many votes from clutter might end up in the same bin. A solution is to keep the bin size small but also count votes from neighbours.
+The algorithm transforms each edge point in the image to the Hough space, where an Accumulator array gets filled with votes. The bin size of the accumulator is an important hyperparameter, if the size is too small, there will be many weak peaks due to noise, if too large accuracy of locating a line drops, and many votes from clutter might end up in the same bin. A solution is to keep the bin size small but also count votes from neighbors.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/Hough_ALG.PNG}
+	\caption{Hough Algorithm}
+	\label{fig:linerepresentationpolar}
+\end{figure}
+\textbf{Binsize}
+\begin{enumerate}
+    \item \textbf{Too small:} many weak peaks (Noise)
+    \item \textbf{Just right:} one strong peak per line, despite noise
+    \item \textbf{Too large:} poor accuracy
+\end{enumerate}
+
+\textbf{Solution:} Keep bin size small, also vote for neighbors in the accumulator (Same as smoothing)
 
 \subsubsection{Voting Algorithm for Finding Lines}
+\begin{enumerate}
+	\item Every edge point casts votes for all lines that are compatible with it
+	\item We choose lines that accumulated a lot of votes
+\end{enumerate}
+
+
+\subsubsection{Voting Algorithm for Finding circles}
 \begin{enumerate}
 	\item Every edge point casts votes for all circles that are compatible with it
 	\item We choose circles that accumulated a lot of votes
 \end{enumerate}
-
 \begin{theorem}
-	Parametrisation of a circle
+	Parametrization of a circle
 	\begin{equation*}
 		(x_i - a)^2 + (y_i - b)^2 = r^2
 	\end{equation*}
@@ -317,27 +492,194 @@ The algorithm transforms each edge point in the image to the Hough space, where 
 \end{theorem}
 
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/hough_circle_accumulator}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/hough_circle_accumulator.png}
 \end{center}
 
 \subsection{Hough Space for Circles With Unknown Radius}
 
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/hough_circle_accumulator_point}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/hough_circle_accumulator_point.png}
 \end{center}
 
 \begin{equation*}
 	y = a\cdot x + \sout{b}
 \end{equation*}
 
+
+\textbf{Algorithm}
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/Circle_Hough.PNG}
+\end{center}
+
+\subsection{Hough Space for ellipses}
+5 independent parameters define an ellipse. $\rightarrow$ So though space is also 5-dimensional
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/Hough_Ellipse.PNG}
+\end{center}
+
+\section{Image Classification}
+Features need a defined database.
+\begin{center}
+	\includegraphics[width=0.4\linewidth]{Machine Learning in Computer Visualisation/img/Aufteilung.PNG}
+\end{center}
+
+\subsection{Confusion matrix}
+The confusion matrix gives an overview of how the classifier classified.
+\begin{equation}
+    Accuracy = \frac{Number of correct classifications}{Number of instances in our database}
+\end{equation}
+\begin{center}
+	\includegraphics[width=0.5\linewidth]{Machine Learning in Computer Visualisation/img/ConfussionMatrix.PNG}
+\end{center}
+
+
+\subsection{Nearest neighbors}
+If the nearest instance of the undeclared instance is an object A then it is an object of type A otherwise it's an object B.
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/NearestNeighbour.PNG}
+         \caption{Classification  with Nearest neighbor}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1\textwidth]{Machine Learning in Computer Visualisation/img/Voroni.PNG}
+         \caption{Voroni diagram or Theissen regions}
+     \end{subfigure}
+
+        \caption{Nearest Neighbors.}
+        \label{fig:Start variants}
+\end{figure}
+
+\subsection{Training}
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/Training_class.PNG}
+\end{center}
+
+\subsection{Convolution neural network}
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/neuralTraining.PNG}
+\end{center}
+Number of \textbf{Parameter}
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/Parameter.PNG}
+\end{center}
+
+\subsubsection{Padding}
+How many $n \times n$ patches are fully contained in a $m \times m$ map?
+\begin{equation}
+    \#fully contained = (m-n+1)\cdot(m-n+1)
+\end{equation}
+If it should keep the same size, add Padding at the edges to make the $m \times m$ bigger.
+
+\subsubsection{Striding}
+Striding means skipping so you can downsample a picture. (The kernel in the picture is 3 x 3)
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/Striding.PNG}
+\end{center}
+
+\subsubsection{Sparse connectivity and Receptive fields}
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/Sparse.PNG}
+         \caption{Sparse connectivity}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1\textwidth]{Machine Learning in Computer Visualisation/img/receprive.PNG}
+         \caption{Receptive fields}
+     \end{subfigure}
+\end{figure}
+
+\subsubsection{Max pooling}
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/MaxPooling.PNG}
+         \caption{Max pooling}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1\textwidth]{Machine Learning in Computer Visualisation/img/MaxPooling2.PNG}
+         \caption{Max pooling in a newtwork}
+     \end{subfigure}
+\end{figure}
+
+\begin{center}
+	\includegraphics[width=0.5\linewidth]{Machine Learning in Computer Visualisation/img/MaxPooling3.PNG}
+\end{center}
+
+\subsubsection{Typical architecture}
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/typArch1.PNG}
+         \caption{Typical architecture}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1\textwidth]{Machine Learning in Computer Visualisation/img/typArch2.PNG}
+         \caption{Typical architecture}
+     \end{subfigure}
+\end{figure}
+
+\subsubsection{Software stack}
+\begin{center}
+	\includegraphics[width=0.5\linewidth]{Machine Learning in Computer Visualisation/img/softwareStack.PNG}
+\end{center}
+
 \section{Semantic Segmentation}
 Identify pixels in images belonging to a specific class, sometimes additionally identifying pixels to belong to a specific instance of a class. It can thus be understood as supervised learning at the pixel level.
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/semantic_segmentation}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/semantic_segmentation.png}
 \end{center}
 Non-semantic segmentation tries to find regions in images without any additional information like classes or similar. It is thus similar to unsupervised learning and often a bottom-up approach. Segmentation in general tries to find a compact representation of a scene in terms of regions which share common properties.
+\subsection{Overview}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/semseguebersicht.PNG}
+\end{center}
 
-\subsection{k-Means Clustering}
+
+\subsection{Split and Merge AND Watershed}
+Watershed and Split and Merge are both supervised learning approaches. \newline
+\textbf{Split and Merge}
+\begin{enumerate}
+    \item Split inhomogeneous regions in the image recursively (Split)
+    \item Merge neighboring regions with matching properties (Merge)
+\end{enumerate}
+
+\textbf{Watershed}
+\begin{itemize}
+    \item Interpret the image as a height map
+    \item Fill the image with water
+    \item Calculate lines of watersheds
+\end{itemize}
+
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/splittAndMerge.PNG}
+         \caption{Split and Merge}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1\textwidth]{Machine Learning in Computer Visualisation/img/Watershed.png}
+         \caption{Watershed}
+     \end{subfigure}
+\end{figure}
+
++\subsection{k-Means Clustering}
 Is not an optimal solution to cluster an image. Lloyds algorithm is one possibility to do clustering
 \begin{enumerate}
 	\item[-\ ] Initialise cluster centers (for example randomly)
@@ -345,11 +687,31 @@ Is not an optimal solution to cluster an image. Lloyds algorithm is one possibil
 	\item Calculate mean values of clusters as new centres
 	\item[-\ ] Iterate until clusters don't change
 \end{enumerate}
-Problems:
-\begin{itemize}
-	\item Number of clusters must be given
-	\item Cluster shapes are given (spherical)
-\end{itemize}
+
+
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+        \textbf{Problems:}
+        \begin{itemize}
+	    \item Number of clusters must be given
+	    \item Cluster shapes are given (spherical)
+        \end{itemize}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+        \textbf{What can be clustered:}
+        \begin{itemize}
+	    \item Anything e.g.
+         \item RGB values
+         \item HSV values
+         \item Position
+         \item Color and position
+        \end{itemize}
+     \end{subfigure}
+\end{figure}
+
+
 
 \subsection{Mean Shift Clustering}
 The shape of the clusters should be variable and not be determined by the method. Mean shift clustering can be achieved by the algorithm
@@ -363,23 +725,37 @@ The problem to search for local maxima of the features without having a feature 
 	K\left(\frac{x-x_i}{h}\right) &= \frac{1}{\sqrt{2\pi}} e^{-\frac{(x-x_i)^2}{2h^2}}
 \end{align*}
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/kernel_density_estimation}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/kernel_density_estimation.png}
 \end{center}
 
 \subsubsection{Mean Shift Algorithm}
 \begin{itemize}[label=-]
 	\item[] For all positions $x$ in the image
-	\item Calculate the mean $\samplemean{x}$ in the environment $N(x)$
+	\item Calculate the mean $m(x)$ in the environment $N(x)$
 	\begin{equation*}
-		\samplemean{x} = \frac{\sum_{x_i \in N(x)} K(x_i - x) x_i }{\sum_{x_i \in N(x)} K(x_i - x)}
+		m(x) = \frac{\sum_{x_i \in N(x)} K(x_i - x) x_i }{\sum_{x_i \in N(x)} K(x_i - x)}
 	\end{equation*}
-	\item Set $x$ to the mean $\samplemean{x}$
+	\item Set $x$ to the mean $m(x)$
 	\item Iterate until $x$ does not change
 \end{itemize}
 \textbf{Attraction basins} are regions from which all trajectories lead to the same node.
-\begin{center}
-	\includegraphics[width=0.7\linewidth]{img/attraction_basins}
-\end{center}
+
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/Meanshift.png}
+         \caption{Meanshift with attraction vector}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/attraction_basins.png}
+         \caption{3D}
+     \end{subfigure}
+\end{figure}
+
+
 
 \subsection{Segmentation by Graph Cuts}
 Images are seen as graph with a node for every pixel with edges between nodes with an affinity weight for each edge. This weight  measures similarity, for example inversely proportional to difference in colour and position.
@@ -396,8 +772,81 @@ Minimal value cuts often cuts too small groups. A better approach is to use norm
 \end{align*}
 where $V$ is the set of all vertices.
 
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/GraphCut1.PNG}
+         \caption{Definition}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/GraphCut2.PNG}
+         \caption{Calculated cut}
+     \end{subfigure}
+\end{figure}
+
+
 \subsection{Superpixels}
 The problem is that images contain many pixels and it is thus inefficient for graph calculations. The solution is to calculate \emph{superpixels} by grouping similar pixels first. This is cheap but leads to over-segmentation. As soon as the superpixels are calculated, normalised graph cuts can be applied.
+\begin{center}
+	\includegraphics[width=0.5\linewidth]{Machine Learning in Computer Visualisation/img/superpixels.PNG}
+\end{center}
+
+\subsubsection{Simple linear iterative clustering (SLIC)}
+Simple linear iterative clustering is a fast method to calculate superpixels.
+\begin{itemize}
+    \item Superpixels are regions with no internal edges
+    \item The number of approximate superpixels is given
+    \item Cluster centers are initialized regularly
+    \item Local clusters are found in the space (L a b x y) i.e. color and position
+\end{itemize}
+
+\subsection{K- Nearest Neighboar}
+Supervised classification.\newline
+Use the label of the k nearest neighbors.
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/kNear.PNG}
+         \caption{Segment of k neighbors}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1.2\linewidth]{Machine Learning in Computer Visualisation/img/linear.PNG}
+         \caption{Linear function cut}
+     \end{subfigure}
+\end{figure}
+
+
+
+\subsection{Support vector machine (SVM)}
+Better than linear function.
+\begin{itemize}
+    \item Optimize: Margin as large as possible
+    \item Minimize: penalty function for wrong samples
+\end{itemize}
+
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1.2\textwidth]{Machine Learning in Computer Visualisation/img/SVM.PNG}
+         \caption{Support vector machine}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/nonLinSVM.PNG}
+         \caption{\textbf{Nonlinear SVM:} Transform inseparable data into a new space}
+     \end{subfigure}
+\end{figure}
+
+
+
 
 \subsection{Features}
 Usually, Raw Input pixel values are not used as input features, as this makes the input space too big. Instead a feature vector is calculated for each pixel or set of pixels. These feature calculate certain properties of an image or image region. Besides classification tasks, these vectors are also used to find subregion or image stitching, and more.
@@ -414,7 +863,7 @@ Features should be invariant to
 
 \subsubsection{Filter Banks}
 \begin{center}
-	\includegraphics[width=0.6\linewidth]{img/filter_bank}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/filter_bank.png}
 \end{center}
 \begin{itemize}
 	\item RFS Filters: edge and line filters at six orientations and three scales, Gaussian and Laplacian of Gaussian
@@ -430,7 +879,7 @@ Measurement of how often a specific combination of a colour value between a pixe
 \subsubsection{Scale Invariant Feature Transform (SIFT)}
 Popular feature descriptor for various tasks such as object matching, image stitching and more. It is a combination of detector and descriptor. The descriptor uses the histogram of the gradient. SIFT results in a 128-dimensional vector.
 \begin{center}
-	\includegraphics[width=0.6\linewidth]{img/SIFT}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/SIFT.png}
 \end{center}
 
 \subsubsection{Histogram of Oriented Gradients (HOG)}
@@ -439,26 +888,216 @@ Computes the gradient images in x and y, and divides the image into cells. Compu
 \subsubsection{HOGles}
 "Invert" the HOG features to simulate the image that generates it. This is a helpful tool to understand bad detections.
 
-\begin{center}
-	\includegraphics[width=0.6\linewidth]{img/HOGles}
-\end{center}
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/Hog.PNG}
+         \caption{HOG}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\linewidth]{Machine Learning in Computer Visualisation/img/HOGles.png}
+         \caption{Inverted HOG}
+     \end{subfigure}
+\end{figure}
+
+\subsection{Metrics}
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \begin{equation}
+    Precision = \frac{tp}{tp+fp}
+\end{equation}
+\begin{equation}
+    Recall = \frac{tp}{tp+fn}
+\end{equation}
+\begin{equation}
+    Specificity = \frac{tn}{tn+fp}
+\end{equation}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+    \begin{equation}
+    Accuracy = \frac{tp+tn}{tp+tn+fp+fn}
+\end{equation}
+    \begin{equation}
+    F1 = \frac{2tp}{2tp+fp+fn}
+\end{equation}
+    \begin{equation}
+    IoU = \frac{tp}{tp+fp+fn}
+\end{equation}
+     \end{subfigure}
+\end{figure}
+
+
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.55\textwidth]{Machine Learning in Computer Visualisation/img/Metrics1.PNG}
+         \caption{HOG}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\linewidth]{Machine Learning in Computer Visualisation/img/Metrics2.PNG}
+         \caption{Inverted HOG}
+     \end{subfigure}
+\end{figure}
+
 
 \section{CNN and Machine Learning in General}
-For this chapter I'd like to refer you to my summaries in Deep Learning and Machine Learning where the desired information is already written down in much more detail.
+Cnn networks.
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/cnn.PNG}
+\end{center}
 
-\section{Finding Multiple Objects}
-The problem at the core is how to scan many positions efficiently for possible faces. Possible approaches are
-\begin{itemize}[label=-, nosep]
-	\item {\color{DodgerBlue4} Features}
-	\item {\color{DodgerBlue4} Classifier}
-	\item {\color{DodgerBlue4} Sliding Window}
-	\item {\color{Firebrick1} Haar Features}
-	\item {\color{Firebrick1} Boosting}
-	\item {\color{Firebrick1} Cascaded Classifiers}
+\subsection{Up and Down sampling in neural networks}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/UpAndDownSamplingpng1.png}
+\end{center}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/UpAndDownSamplingpng2.png}
+\end{center}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/UpAndDownSamplingpng3.png}
+\end{center}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/UpAndDownSamplingpng4.png}
+\end{center}
+
+This method is usually done with a U-Net or a SegNet architecture.
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/UNET.PNG}
+         \caption{U-Net}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=0.95\linewidth]{Machine Learning in Computer Visualisation/img/SegNet.PNG}
+         \caption{SegNet}
+     \end{subfigure}
+\end{figure}
+
+\subsection{Architectures}
+\textbf{Residual network}
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.30\textwidth}
+         \centering
+         \includegraphics[width=0.95\textwidth]{Machine Learning in Computer Visualisation/img/residual1.PNG}
+         \caption{U-Net}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.69\textwidth}
+         \centering
+         \includegraphics[width=0.95\linewidth]{Machine Learning in Computer Visualisation/img/residual2.PNG}
+         \caption{SegNet}
+     \end{subfigure}
+\end{figure}
+\textbf{Vision Transformer}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/VisionTransormer.PNG}
+\end{center}
+
+\subsection{Deep neural networks}
+Neural Networks: \textbf{Feature} $\rightarrow$ \textbf{Output} \newline
+Deep Neural Networks: \textbf{Feature} $\rightarrow$ \textbf{Features} $\rightarrow$ \textbf{Output}
+\subsubsection{Failures}
+\begin{itemize}
+    \item Overfitting
+    \item Results too bad
+    \item Uneven class distribution
+    \item Does not learn anything
+    \begin{itemize}
+        \item different Model
+        \item more parameters
+    \end{itemize}
 \end{itemize}
 
+\subsubsection{Regularization}
+Regularization means limiting the capacity.
+\textbf{Capacity: }this is the number of parameters in the network.
+Regularization methods:
+\begin{itemize}
+    \item $L^2$ Regularization $\Omega(\theta) = \frac{1}{2}\parallel w\parallel_{2}^2$ whereas $\parallel w\parallel_p = \sqrt[p]{W_1^p+W_2^p+...+W_n^p}$ 
+    \item Use several models trained separately; vote for the best
+    \item Dropout $\rightarrow$ Drop nodes; Set weights to 0
+    \item Early stopping $\rightarrow$ Stop if error in validation increases again
+\end{itemize}
+
+\subsubsection{Batch Algorithm}
+\begin{itemize}
+    \item Used properties in optimization (for example the gradient) are expectations over the training set
+    \item Calculating the expectations over the whole data set is very time consuming
+    \item We can also calculate them by randomly sampling from the data set à Minibatch algorithms
+\end{itemize}
+\textbf{Minibatchsize "Hyperparameter"}
+\begin{itemize}
+    \item Larger batches $\rightarrow$ better estimates $\rightarrow$non-linear increasing costs
+    \item Very small batch $\rightarrow$ underutilized hardware
+    \item Memory might limit batch size
+\end{itemize}
+\textbf{Use adam or AdaGrade as optimizer}
+\subsubsection{Batch Normalization and Activations functions}
+Normalize the input from 0 to 1.
+\textbf{Activation functions}
+\begin{itemize}
+    \item use ReLu
+    \item Tryout Leaky Relu
+    \item Possible try tanh; usually worse
+    \item Don't use sigmoid in hidden layers
+\end{itemize}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/actfunrtions.PNG}
+\end{center}
+
+
+\section{Finding Multiple Objects}
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \textbf{Problems}
+         \begin{itemize}
+             \item Different backgrounds
+             \item Illumination
+             \item Occlusion (Fremdbestandteile)
+             \item Deformation
+             \item Interclass variants (Katzen rassen)
+         \end{itemize}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+        \textbf{Algorithms}
+        \begin{itemize}
+            \item Classic
+            \begin{itemize}
+                \item Cascaded Classifier
+                \item Viola Jones
+                \item Face detector
+            \end{itemize}
+            \item Modern:
+            \begin{itemize}
+                \item RCNN
+                \item YOLO
+                \item SSD
+            \end{itemize}
+        \end{itemize}
+     \end{subfigure}
+\end{figure}
+
+
 \subsection{Boosting}
-For an input training data with weights, at each step $t \in 1..T$ train a weak classifier, let it classify the training data and increase the weight on incorrectly classified samples. Use the weighted combination of all weak classifiers for the final, strong classifier. The final strong classifier $F(x)$ can be understood as a weighted, linear combination of the weak classifiers.
+Train weak classifiers and ad them up.
 \begin{equation*}
 	F(x) = \alpha_1 f_1(x) + \alpha_2 f_2(x) + \alpha_2 f_2(x) + \dots
 \end{equation*}
@@ -470,34 +1109,39 @@ Weak classifier used with $f$ feature, $\theta$ threshold and $p_j$ parity
 		\end{matrix} \right.
 \end{equation*}
 
-\subsection{Haar Features}
-Filter responses, that is convolutions, are computationally intensive. The idea of haar features is to only use simple filters of different sizes and shapes with only $-1$ or $1$ in the masks. Calculate the features on sliding sub windows (for example $24\times24$ pixels) and take all possible combinations of filters as feature candidates. This can be done in a fast manner using integral images, where each pixel of the integral image contains the sum of all values in the rectangle spanned to the upper left corner (see image \ref{fig:integralimage}). The sum of pixel $D$ in figure \ref{fig:integralimagehaar} is $4 + 1 - (2 + 3)$ or in terms of the named rectangles
-\begin{equation*}
-	D = (A+B+C+D) + A - ((A+B) + (A+C))
-\end{equation*}
-
-\begin{figure}[tbh]
-	\centering
-	\begin{subfigure}[t]{0.45\linewidth}
-		\includegraphics[width=\linewidth]{img/integral_image}
-		\caption{Visualisation of an integral image sum}
-		\label{fig:integralimage}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.45\linewidth}
-	\includegraphics[width=\linewidth]{img/integral_image_haar}
-	\caption{Calculating Haar features using an integral image}
-	\label{fig:integralimagehaar}
-	\end{subfigure}
-\end{figure}
-The humongous size of the features per sub window can be evaluated by treating each feature as a weak classifier and training important features using adaboost.
-
-\subsection{Face Detection}
-The problem is that there are thousands of possible position or scale combinations in the image which need to be evaluated, while true faces are rare in the image. The idea is thus to dismiss the regions without a face efficiently. The goal for a classifier is to have a high \emph{true} positive rate (85\%-95\%) and a low \emph{false} positive rate ($10^{-5}-10^{-6}$). Use this classifier in a cascade which multiplies false and true positive rates. False results are rejected early in the processing.
 \begin{center}
-	\includegraphics[width=0.6\linewidth]{img/cascade_classifier_approach}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/boosting.PNG}
 \end{center}
 
-\subsection{HOG for Human Detection}
+\subsection{Intergral Image}
+Fast calculation of filter results by using integrals images.
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/intergral1.PNG}
+\end{center}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/intergral2.PNG}
+\end{center}
+
+\subsection{Face Detection}
+\begin{itemize}
+    \item Use a sequence of individual classifiers
+    \item Reject false result early
+    \item Each step of the 10-step cascade is trained with Adaboost using 20 different features
+\end{itemize}
+
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/cascade_classifier_approach.png}
+\end{center}
+
+\subsection{Adaboost}
+The first and second features selected by Adaboost.\newline
+First feature $\rightarrow$ measures intensity between the eye region and the face
+Second feature $\rightarrow$ compares the intensities in the eye region to the intensity across the bridges of the nose
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{Machine Learning in Computer Visualisation/img/adaboost.PNG}
+\end{center}
+
+\subsection{Histogram of Oriented Gradients HOG for Human Detection}
 Detection Pipeline
 \begin{itemize}[label=-]
 	\item Calculate HOG Descriptors
@@ -505,7 +1149,12 @@ Detection Pipeline
 	\item Use Linear SVM for Person or Non-Person Classification
 \end{itemize}
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{img/hog_human_detection}
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/hog_human_detection.png}
+\end{center}
+
+\subsection{Region proposal by selective search}
+\begin{center}
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/regionprob.PNG}
 \end{center}
 
 \subsection{OverFeat}
@@ -531,7 +1180,7 @@ Combine Classification, Localisation and Detection.
 
 \begin{figure}[tbh]
 	\centering
-	\includegraphics[width=0.7\linewidth]{img/classification_localisation}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/classification_localisation.png}
 	\caption{Classification and Localisation visualised}
 	\label{fig:classificationlocalisation}
 \end{figure}
@@ -541,11 +1190,11 @@ Sliding windows have the drawback of the huge numbers of different positions and
 \subsection{R-CNN}
 Extract region proposals, compute CNN features on these, classify the regions using SVM.
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/r-cnn}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/r-cnn.png}
 \end{center}
 
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/r-cnn_structure}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/r-cnn_structure.png}
 \end{center}
 
 \subsubsection{Feature Extraction}
@@ -562,8 +1211,8 @@ Use one linear SVM per class (one true class versus all others), consider region
 \subsubsection{FAST R-CNN}
 Replace SVM of R-CNN with fully connected neural network for classification of objects and refined bounding boxes
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/fast_r-cnn_structure}
-	\includegraphics[width=0.7\linewidth]{img/fast_r-cnn_structure2}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/fast_r-cnn_structure.png}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/fast_r-cnn_structure2.png}
 \end{center}
 
 \subsection{You Only Look Once (YOLO)}
@@ -575,6 +1224,10 @@ YOLO is a Single Neural Network that predicts bounding boxes and classification 
 	\item Multiply confidence score and probabilities at test time
 \end{itemize}
 
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/yolo.PNG}
+\end{center}
+
 \subsubsection{Improvements}
 \begin{itemize}[label=-]
 	\item Add Batch Normalisation
@@ -582,6 +1235,26 @@ YOLO is a Single Neural Network that predicts bounding boxes and classification 
 	\item Use Anchor Bounding Boxes from k-Means Analysis on the training data
 	\item Use new base net (darknet19 and darknet 58)
 \end{itemize}
+
+\subsubsection{Precision}
+\textbf{Intersect of union}
+Used for bounding boxes.\newline
+False positive < Threshold < True positive
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/intersectOfUnion.PNG}
+\end{center}
+\textbf{Mean average precision}
+\begin{itemize}
+    \item Mean average precision is the mean of the average precision (AP) of each class
+    \item So calculate AP first for each class
+    \item Then take the mean over all classes
+\end{itemize}
+\textbf{Average precision}
+\begin{center}
+	\includegraphics[width=1\linewidth]{Machine Learning in Computer Visualisation/img/Average precision.PNG}
+\end{center}
+
+
 
 \section{Generating Images}
 
@@ -597,7 +1270,7 @@ A conditional GAN should learn the mapping from input image $x$ and noise $z$ to
 In practice adding noise as input proves ineffective, as the network learns to ignore it. One solution is to use dropout as noise, both in training and during testing.
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{img/conditional_GAN_edge_map}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/conditional_GAN_edge_map.png}
 	\caption{In conditional GANs both the Generator $G$ and the Discriminator $D$ input the edge map}
 	\label{fig:conditionalganedgemap}
 \end{figure}
@@ -606,7 +1279,7 @@ In practice adding noise as input proves ineffective, as the network learns to i
 Generator Architectures
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{img/conditional_GAN_generator_architectures}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/conditional_GAN_generator_architectures.png}
 	\caption{U-Net architectures with connections between the layers seem to work better}
 	\label{fig:conditionalgangeneratorarchitectures}
 \end{figure}
@@ -633,12 +1306,12 @@ These Gram matrices describe the texture model.
 \end{enumerate}
 
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{img/conditional_GAN_texture_generation}
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/conditional_GAN_texture_generation.png}
 \end{center}
 
 \subsection{Neural Style Transfer}
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/conditional_GAN_style_transfer}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/conditional_GAN_style_transfer.png}
 \end{center}
 
 \subsubsection{Content Representation}
@@ -659,13 +1332,13 @@ and including several layers
 \end{equation*}
 
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{img/conditional_GAN_style_representation.png}
+	\includegraphics[width=0.8\linewidth]{Machine Learning in Computer Visualisation/img/conditional_GAN_style_representation.png}
 \end{center}
 
 \subsubsection{Fast Style Transfer}
 The problem is that style transfer is slow as it requires many passes through VNN, the solution is to train a neural network to perform style transfer. Train feedforward network for each style, use pretrained CNN with losses as before, and After training, stylize image with single forward pass.
 \begin{center}
-	\includegraphics[width=0.7\linewidth]{img/fast_style_transfer}
+	\includegraphics[width=0.7\linewidth]{Machine Learning in Computer Visualisation/img/fast_style_transfer.png}
 \end{center}
 
 \clearpage
@@ -679,7 +1352,7 @@ mask = im > 0.8 # bright pixels will be True in the mask, others will be False
 plt.imshow(mask)
 \end{minted}
 \begin{center}
-	\includegraphics[width=0.4\linewidth]{img/BinaryMask.png}
+	\includegraphics[width=0.4\linewidth]{Machine Learning in Computer Visualisation/img/BinaryMask.png}
 \end{center}
 
 \subsubsection{Connected Component Analysis}
